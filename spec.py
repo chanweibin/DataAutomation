@@ -68,3 +68,5 @@ balsaSpec = {
             "Low": {
                 "Gain"      :   0.00001,
                 "Offset"    :   0.0001 }}}}
+
+x = (balsaSpec["PowerSupplySpec"]["Current"]["High"]["Gain"])
