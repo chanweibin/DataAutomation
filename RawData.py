@@ -1,7 +1,12 @@
-import os, sys, re, argparse
-import pandas as pd
+import argparse
+import os
+import re
+import sys
 from datetime import datetime
+import pandas as pd
 from openpyxl import load_workbook
+
+# sys.path.append("C:\\Users\\weichan\\OneDrive - Keysight Technologies\\Documents\\Python Scripts\\DataAutomation")
 import Unit_TestInfo as utif
 
 # IO file settings, currently not in use
@@ -15,6 +20,9 @@ output_full_path = output_file_loc + output_file_name
 
 # dataFrame settings
 compiledresultDF = pd.DataFrame()
+
+# test and unit information
+serNumCol = "Parent4"
 
 scriptName = sys.argv[0]
 parser = argparse.ArgumentParser(description=str("Inputing arguments for " + scriptName))
@@ -48,9 +56,7 @@ if args.output:
 
 if args.file:
     output_file_name = args.file
-    if output_file_name.endswith('.xlsx'):
-        pass
-    else:
+    if not output_file_name.endswith('.xlsx'):
         output_file_name += '.xlsx'
 
 if args.user:
@@ -67,7 +73,7 @@ if args.args4:
 def check_file_loc():
 
     global output_full_path
-
+    
     try:
         if not os.path.exists(csv_file_loc):
             os.makedirs(csv_file_loc)
@@ -95,13 +101,21 @@ def createDataFrame():
         for file in range(len(files)):
             os.chdir(csv_file_loc)
             print(f"Extracting data from [{files[file]}] ...")
-            resultDFList.append(pd.read_csv(files[file]))
+
+            rawDF = pd.read_csv(files[file])
+            resultDFList.append(rawDF)
+
+            sn = utif.get_SN(rawDF[serNumCol])
+            resultName = "Result " + sn
+            percentName = "% " + sn
+
             argslist = [args1, args2, args3]
             resultDFList[file] = resultDFList[file][argslist]
 
+
             # workaround, ToDO: use regex to extract unit SN as ResultName
-            resultName = args2 + str(file)
-            percentName = args3 + str(file)
+            # resultName = args2 + str(file)
+            # percentName = args3 + str(file)
             resultDFList[file] = resultDFList[file].set_index(args1)
             resultDFList[file] = resultDFList[file].rename(columns={args2:resultName, args3:percentName})
 
@@ -129,7 +143,6 @@ def createDataFrame():
 
     except Exception as e:
         raise Exception("Error at createDataFrame: " + str(e))
-        sys.exit(1)
 
 
 
