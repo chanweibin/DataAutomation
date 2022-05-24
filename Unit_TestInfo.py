@@ -5,7 +5,6 @@ import sys
 import math
 import numpy as np 
 
-from numpy import mat
 
 
 def get_unit_info(dfCol):

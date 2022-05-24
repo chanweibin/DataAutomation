@@ -112,10 +112,6 @@ def createDataFrame():
             argslist = [args1, args2, args3]
             resultDFList[file] = resultDFList[file][argslist]
 
-
-            # workaround, ToDO: use regex to extract unit SN as ResultName
-            # resultName = args2 + str(file)
-            # percentName = args3 + str(file)
             resultDFList[file] = resultDFList[file].set_index(args1)
             resultDFList[file] = resultDFList[file].rename(columns={args2:resultName, args3:percentName})
 

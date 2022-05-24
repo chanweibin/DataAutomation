@@ -1,10 +1,15 @@
 # DataAutomation
 Automation to consolidate data from csv file  ( )
-  1. To excel ( )
+  1. To excel (X)
   2. To graph ( )
 able to calculate spec w/ w/t tempCo          ( )
 retrieve data from raw data                   ( )
   1. Naming   ( )
-  2. Unit SN  ( )
+  2. Unit SN  (X)
   3. PT No.   ( )
-  4. 
+  4. Model Num(X)
+  5. Nominal Val ( )
+      a. Voltage    ( )
+      b. Current    ( )
+      c. Resistance ( )
+      d. Power      ( )
