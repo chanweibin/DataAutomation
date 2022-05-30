@@ -12,7 +12,6 @@ def get_unit_info(dfCol):
     try:
         dut_info = None
         dfCol.fillna(0, inplace=True)
-        print(dfCol)
 
         cnt = 0
         while (dut_info is None) or (dut_info == 0) :

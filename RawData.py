@@ -49,7 +49,7 @@ else:
 if args.csv:
     csv_file_loc = args.csv
 else:
-    pass#raise Exception("Please insert raw data file location")
+    pass #raise Exception("Please insert raw data file location")
 
 if args.output:
     output_file_loc = args.output
@@ -105,20 +105,23 @@ def createDataFrame():
             rawDF = pd.read_csv(files[file])
             resultDFList.append(rawDF)
 
-            sn = utif.get_SN(rawDF[serNumCol])
+            sn = utif.get_SN(rawDF[serNumCol])#.head(4)) # head 4 are initDut result
             resultName = "Result " + sn
             percentName = "% " + sn
+            del(rawDF)
 
             argslist = [args1, args2, args3]
             resultDFList[file] = resultDFList[file][argslist]
 
             resultDFList[file] = resultDFList[file].set_index(args1)
             resultDFList[file] = resultDFList[file].rename(columns={args2:resultName, args3:percentName})
+            # print(resultDFList[file].to_string())
 
         # compile df list into signle df
         compileDF = resultDFList[0]
         for file in range(len(files)-1):
-            compileDF = compileDF.join(resultDFList[file+1])
+            compileDF = compileDF.merge(resultDFList[file+1], left_index=True, right_index=True, how="outer")
+        # print("MERGED:"+ compileDF.to_string())
 
         # args4 for UL/LL etc, only appear one time in df
         if args4:
@@ -134,7 +137,7 @@ def createDataFrame():
         sortCols = compileDF.columns.tolist()
         sortCols.sort()
         compileDF = compileDF[sortCols]
-
+    
         return compileDF
 
     except Exception as e:
