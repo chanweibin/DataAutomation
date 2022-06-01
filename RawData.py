@@ -4,7 +4,7 @@ import re
 import sys
 from datetime import datetime
 import pandas as pd
-from openpyxl import load_workbook
+from openpyxl import load_workbook 
 
 # sys.path.append("C:\\Users\\weichan\\OneDrive - Keysight Technologies\\Documents\\Python Scripts\\DataAutomation")
 import Unit_TestInfo as utif
@@ -105,9 +105,12 @@ def createDataFrame():
             rawDF = pd.read_csv(files[file])
             resultDFList.append(rawDF)
 
-            sn = utif.get_SN(rawDF[serNumCol])#.head(4)) # head 4 are initDut result
-            resultName = "Result " + sn
-            percentName = "% " + sn
+            # sn = utif.get_SN(rawDF[serNumCol])#.head(4)) # head 4 are initDut result
+            # resultName = "Result " + sn
+            # percentName = "% " + sn
+            name = files[file].split(".csv")[0]
+            resultName = "raw " + name
+            percentName = "% " + name
             del(rawDF)
 
             argslist = [args1, args2, args3]
