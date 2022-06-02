@@ -1,4 +1,5 @@
 import argparse
+from heapq import merge
 import os
 import re
 import sys
@@ -11,9 +12,7 @@ import Unit_TestInfo as utif
 
 # IO file settings, currently not in use
 user = 'weichan'
-#csv_file_loc = "C:\\Users\\{0}\\Downloads\\dataAutomation\\RAW_DATA\\".format(user)
 csv_file_loc = os.getcwd() + "\\"
-#output_file_loc = "C:\\Users\\{0}\\Downloads\\dataAutomation\\Output\\".format(user)
 output_file_loc = os.getcwd() + "\\"
 output_file_name = "outputfile-" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".xlsx"
 output_full_path = output_file_loc + output_file_name
@@ -23,6 +22,8 @@ compiledresultDF = pd.DataFrame()
 
 # test and unit information
 serNumCol = "Parent4"
+emulCol = "Parent3"
+funCol = "Parent2"
 
 scriptName = sys.argv[0]
 parser = argparse.ArgumentParser(description=str("Inputing arguments for " + scriptName))
@@ -35,8 +36,9 @@ parser.add_argument('-args1', metavar="Column1 Name", default="Name")
 parser.add_argument('-args2', metavar="Column2 Name", default="Result")
 parser.add_argument('-args3', metavar="Column3 Name", default="PercentSpec")
 parser.add_argument('-args4', metavar="Column4 Name", default="UpperLimit,LowerLimit,Parent3") # those col that only occurs 1 time
-parser.add_argument('-args5', metavar="Column5 Name", default="Parent4") # cols that occur multiple times
+parser.add_argument('-args5', metavar="Column5 Name", default="Parent4,Parent3,Parent2") # cols that occur multiple times
 parser.add_argument('-pt', metavar="Sheet Name", default="Sheet1", help="Temp workaround")
+parser.add_argument('-colname', metavar="Choose SN name, unit || filename", default="unit")
 
 args = parser.parse_args()
 
@@ -70,6 +72,10 @@ args4 = []
 if args.args4:
     args4 = args.args4.split(",")
 
+if args.colname:
+    colname = args.colname
+
+
 def check_file_loc():
 
     global output_full_path
@@ -84,7 +90,6 @@ def check_file_loc():
 
     except Exception as e:
         raise Exception("Error at check_file_loc : " + str(e))
-        sys.exit(1)
 
 
 
@@ -105,13 +110,15 @@ def createDataFrame():
             rawDF = pd.read_csv(files[file])
             resultDFList.append(rawDF)
 
-            # sn = utif.get_SN(rawDF[serNumCol])#.head(4)) # head 4 are initDut result
-            # resultName = "Result " + sn
-            # percentName = "% " + sn
-            name = files[file].split(".csv")[0]
-            resultName = "raw " + name
-            percentName = "% " + name
-            del(rawDF)
+            if colname == "unit":
+                sn = utif.get_SN(rawDF[serNumCol])#.head(4)) # head 4 are initDut result
+                resultName = "Result " + sn
+                percentName = "% " + sn
+                del(rawDF)
+            else:
+                name = files[file].split(".csv")[0]
+                resultName = "raw " + name
+                percentName = "% " + name
 
             argslist = [args1, args2, args3]
             resultDFList[file] = resultDFList[file][argslist]
