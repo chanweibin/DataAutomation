@@ -1,5 +1,4 @@
 import argparse
-from heapq import merge
 import os
 import re
 import sys
@@ -7,7 +6,6 @@ from datetime import datetime
 import pandas as pd
 from openpyxl import load_workbook 
 
-# sys.path.append("C:\\Users\\weichan\\OneDrive - Keysight Technologies\\Documents\\Python Scripts\\DataAutomation")
 import Unit_TestInfo as utif
 
 # IO file settings, currently not in use
@@ -35,8 +33,8 @@ parser.add_argument('-user', metavar="Username", help="User PC name")
 parser.add_argument('-args1', metavar="Column1 Name", default="Name")
 parser.add_argument('-args2', metavar="Column2 Name", default="Result")
 parser.add_argument('-args3', metavar="Column3 Name", default="PercentSpec")
-parser.add_argument('-args4', metavar="Column4 Name", default="UpperLimit,LowerLimit,Parent3") # those col that only occurs 1 time
-parser.add_argument('-args5', metavar="Column5 Name", default="Parent4,Parent3,Parent2") # cols that occur multiple times
+parser.add_argument('-args4', metavar="Column4 Name", default="UpperLimit,LowerLimit,Parent3,Parent2") # those col that only occurs 1 time
+parser.add_argument('-args5', metavar="Column5 Name", default="Parent4") # cols that occur multiple times
 parser.add_argument('-pt', metavar="Sheet Name", default="Sheet1", help="Temp workaround")
 parser.add_argument('-colname', metavar="Choose SN name, unit || filename", default="unit")
 
@@ -92,6 +90,18 @@ def check_file_loc():
         raise Exception("Error at check_file_loc : " + str(e))
 
 
+def get_test_info(df):
+
+    try:
+        df
+
+
+        return df
+
+    except Exception as e:
+        raise Exception("Error at get_test_info : " + str(e))
+
+
 
 def createDataFrame():
 
@@ -121,32 +131,36 @@ def createDataFrame():
                 percentName = "% " + name
 
             argslist = [args1, args2, args3]
+            if args4:
+                argslist.extend(args4)
             resultDFList[file] = resultDFList[file][argslist]
 
             resultDFList[file] = resultDFList[file].set_index(args1)
             resultDFList[file] = resultDFList[file].rename(columns={args2:resultName, args3:percentName})
-            # print(resultDFList[file].to_string())
 
         # compile df list into signle df
         compileDF = resultDFList[0]
         for file in range(len(files)-1):
-            compileDF = compileDF.merge(resultDFList[file+1], left_index=True, right_index=True, how="outer")
+            compileDF = compileDF.merge(resultDFList[file+1], left_index=True, right_index=True, how="outer", suffixes=('','_y'))
+            compileDF.drop(compileDF.filter(regex='_y$').columns.tolist(), axis=1, inplace=True)
         # print("MERGED:"+ compileDF.to_string())
-
+        
         # args4 for UL/LL etc, only appear one time in df
-        if args4:
-            args4.insert(0, args1)
-            args4DF = pd.read_csv(files[0])
-            args4DF = args4DF[args4]
-            print("Appended:\n" + args4DF)
-            args4DF = args4DF[args4]
-            args4DF = args4DF.set_index(args1)
-            compileDF = compileDF.join(args4DF)
+        # if args4:
+        #     args4.insert(0, args1)
+        #     args4DF = pd.read_csv(files[0]) # use 1st file as reference
+        #     args4DF = args4DF[args4]
+        #     print("Appended:\n" + args4DF)
+        #     args4DF = args4DF[args4]
+        #     args4DF = args4DF.set_index(args1)
+        #     compileDF = compileDF.join(args4DF)
 
         # rearrage df
         sortCols = compileDF.columns.tolist()
         sortCols.sort()
         compileDF = compileDF[sortCols]
+
+        compileDF = get_test_info(compileDF)
     
         return compileDF
 
