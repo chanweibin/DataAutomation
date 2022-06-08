@@ -3,27 +3,23 @@ from random import random
 import re
 import sys
 import math
-import numpy as np 
+import pandas as pd
 
 
 
 def get_unit_info(dfCol):
     
     try:
-        dut_info = None
-        dfCol.fillna(0, inplace=True)
-
-        cnt = 0
-        while (dut_info is None) or (dut_info == 0) :
-            dut_info = dfCol[cnt]
-            cnt+=1
+        
+        firstRow = dfCol.first_valid_index()
+        dut_info = dfCol.at[firstRow]
+        
         
         dut_info = dut_info.split()
         serialNum = dut_info[-1]
         modelName = dut_info[-2]
         print("Serial Number: " + serialNum)
         print("Model Name: " + modelName)
-
         return serialNum, modelName
 
     except Exception as e:

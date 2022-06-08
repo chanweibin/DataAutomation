@@ -41,13 +41,12 @@ def read_Excel():
     os.chdir(output_file_loc)
     output_file_name = [x for x in os.listdir(output_file_loc) if x.endswith(".xlsx")]
     if len(output_file_name) > 2:
+        print("Please specify file name")
         raise Error("Nope")
-    output_full_path = output_file_loc + "\\" + output_file_name[0]#.split('.xlsx')[0]
+    output_full_path = output_file_loc + "\\" + output_file_name[0]
     xls = pd.ExcelFile(output_full_path, engine="openpyxl")
     oldDF = pd.read_excel(xls, 0)
     oldDF = oldDF.set_index(args1)
-    
-    # oldDF = pd.read_excel(output_file_name, engine="openpyxl")
     
     return oldDF, output_full_path
 
@@ -103,3 +102,4 @@ if __name__ == "__main__":
     writer.book = excelWorkbook
     df.to_excel(writer, header=True)
     writer.save()
+    print("Done...")

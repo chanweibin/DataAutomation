@@ -4,21 +4,22 @@ import re
 import sys
 from datetime import datetime
 import pandas as pd
+import numpy as np
 from openpyxl import load_workbook 
 
 import Unit_TestInfo as utif
 
-# IO file settings, currently not in use
+# TODO: IO file settings, currently not in use
 user = 'weichan'
 csv_file_loc = os.getcwd() + "\\"
 output_file_loc = os.getcwd() + "\\"
 output_file_name = "outputfile-" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".xlsx"
 output_full_path = output_file_loc + output_file_name
 
-# dataFrame settings
+# * dataFrame settings
 compiledresultDF = pd.DataFrame()
 
-# test and unit information
+# * test and unit information
 serNumCol = "Parent4"
 emulCol = "Parent3"
 funCol = "Parent2"
@@ -44,12 +45,12 @@ if args.id and args.id.isdigit():
     id = int(args.id)
 else:
     id = 0
-    # print("ID is null or non-digit, generating ID: {:04d}".format(id))
+    # TODO: print("ID is null or non-digit, generating ID: {:04d}".format(id))
 
 if args.csv:
     csv_file_loc = args.csv
 else:
-    pass #raise Exception("Please insert raw data file location")
+    pass # TODO: raise Exception("Please insert raw data file location")
 
 if args.output:
     output_file_loc = args.output
@@ -90,10 +91,28 @@ def check_file_loc():
         raise Exception("Error at check_file_loc : " + str(e))
 
 
+# ! WIP
 def get_test_info(df):
 
     try:
-        df
+        if df["Parent3"].str.contains("PowerSupply", na=False).all():
+            df["Spec_EMUL"] = "PowerSupply"
+            print(df.to_string())
+            
+            sys.exit(1)
+        # elif df["Parent3"].contains("Eload"):
+        else:
+            df["Spec_EMUL"] = "ELoad"
+            print(df.to_string())
+            sys.exit(1)
+        
+        if df["Spec_EMUL"] == "PowerSupply":
+            if df["Parent2"].contains("VoltageAccuracyTest"):
+                df["Spec_FUNC"] = "VOLT"
+            else:
+                df["Spec_FUNC"] = "CURR"
+        
+        sys.exit(1)
 
 
         return df
@@ -121,7 +140,7 @@ def createDataFrame():
             resultDFList.append(rawDF)
 
             if colname == "unit":
-                sn = utif.get_SN(rawDF[serNumCol])#.head(4)) # head 4 are initDut result
+                sn = utif.get_SN(rawDF[serNumCol]) 
                 resultName = "Result " + sn
                 percentName = "% " + sn
                 del(rawDF)
@@ -138,29 +157,18 @@ def createDataFrame():
             resultDFList[file] = resultDFList[file].set_index(args1)
             resultDFList[file] = resultDFList[file].rename(columns={args2:resultName, args3:percentName})
 
-        # compile df list into signle df
+        # * compile df list into signle df
         compileDF = resultDFList[0]
         for file in range(len(files)-1):
             compileDF = compileDF.merge(resultDFList[file+1], left_index=True, right_index=True, how="outer", suffixes=('','_y'))
             compileDF.drop(compileDF.filter(regex='_y$').columns.tolist(), axis=1, inplace=True)
         # print("MERGED:"+ compileDF.to_string())
         
-        # args4 for UL/LL etc, only appear one time in df
-        # if args4:
-        #     args4.insert(0, args1)
-        #     args4DF = pd.read_csv(files[0]) # use 1st file as reference
-        #     args4DF = args4DF[args4]
-        #     print("Appended:\n" + args4DF)
-        #     args4DF = args4DF[args4]
-        #     args4DF = args4DF.set_index(args1)
-        #     compileDF = compileDF.join(args4DF)
+        # * rearrage df
+        compileDF.sort_index(axis=1, inplace=True) # sort column
+        compileDF.sort_values(["Parent3","Parent2","Name"], ascending=True, inplace=True, na_position="first") # sort rows
 
-        # rearrage df
-        sortCols = compileDF.columns.tolist()
-        sortCols.sort()
-        compileDF = compileDF[sortCols]
-
-        compileDF = get_test_info(compileDF)
+        # compileDF = get_test_info(compileDF)
     
         return compileDF
 
