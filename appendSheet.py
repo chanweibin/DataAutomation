@@ -31,15 +31,18 @@ if args.file:
     output_file_name = args.file
     if not output_file_name.endswith('.xlsx'):
         output_file_name += '.xlsx'
+else:
+    output_file_name = None
 
 args1, args2, args3 = args.args1, args.args2, args.args3
 
 
 
 def read_Excel():
-    
+    global output_file_name
     os.chdir(output_file_loc)
-    output_file_name = [x for x in os.listdir(output_file_loc) if x.endswith(".xlsx")]
+    if not output_file_name:
+        output_file_name = [x for x in os.listdir(output_file_loc) if x.endswith(".xlsx")]
     if len(output_file_name) > 2:
         print("Please specify file name")
         raise Error("Nope")
@@ -68,7 +71,7 @@ def read_append_csv(df):
         resultDFList.append(rawDF)
 
         name = files[file].split(".csv")[0]
-        resultName = "raw " + name
+        resultName = "Result " + name
         percentName = name
         
         argslist = [args1, args2, args3]
@@ -76,14 +79,14 @@ def read_append_csv(df):
         resultDFList[file] = resultDFList[file].set_index(args1)
         resultDFList[file] = resultDFList[file].rename(columns={args2:resultName, args3:percentName})
 
-        compileDF = pd.DataFrame()
-        for file in range(len(files)):
-            compileDF = compileDF.merge(resultDFList[file], left_index=True, right_index=True, how="outer", suffixes=('','_y'))
+    compileDF = pd.DataFrame()
+    for file in range(len(files)):
+        compileDF = compileDF.merge(resultDFList[file], left_index=True, right_index=True, how="outer", suffixes=('','_y'))
 
     df = df.merge(compileDF, left_index=True, right_index=True, how="outer", suffixes=('','_y'))
-    sortCols = df.columns.tolist()
-    sortCols.sort()
-    df = df[sortCols]
+    df.sort_index(axis=1, inplace=True) # sort column
+    df.sort_values(["Parent3","Parent2","Name"], ascending=True, inplace=True, na_position="first") # sort rows
+
 
     return df
 
