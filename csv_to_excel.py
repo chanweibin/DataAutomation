@@ -13,7 +13,7 @@ import Unit_TestInfo as utif
 user = 'weichan'
 csv_file_loc = os.getcwd() + "\\"
 output_file_loc = os.getcwd() + "\\"
-output_file_name = "outputfile-" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".xlsx"
+output_file_name = "Balsa" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".xlsx"
 output_full_path = output_file_loc + output_file_name
 
 # * dataFrame settings

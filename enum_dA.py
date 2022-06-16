@@ -10,4 +10,5 @@ class InputFileType(Enum):
 class OutputFileType(Enum):
     xls = 1 
     html = 2
+    csv = 3 
     
