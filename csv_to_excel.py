@@ -13,7 +13,7 @@ import Unit_TestInfo as utif
 user = 'weichan'
 csv_file_loc = os.getcwd() + "\\"
 output_file_loc = os.getcwd() + "\\"
-output_file_name = "outputfile-" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".xlsx"
+output_file_name = "balsa-testname" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".xlsx"
 output_full_path = output_file_loc + output_file_name
 
 # * dataFrame settings
@@ -166,7 +166,7 @@ def createDataFrame():
         
         # * rearrage df
         compileDF.sort_index(axis=1, inplace=True) # sort column
-        compileDF.sort_values(["Parent3","Parent2","Name"], ascending=True, inplace=True, na_position="first") # sort rows
+        compileDF.sort_values(["Parent3","Name"], ascending=True, inplace=True, na_position="first") # sort rows
 
         # compileDF = get_test_info(compileDF)
     
