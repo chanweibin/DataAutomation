@@ -9,6 +9,7 @@ from openpyxl import load_workbook
 
 import Unit_TestInfo as utif
 
+#! ----------------------------------- FILE SETTINGS -----------------------------------
 # TODO: IO file settings, currently not in use
 user = 'weichan'
 csv_file_loc = os.getcwd() + "\\"
@@ -23,6 +24,9 @@ compiledresultDF = pd.DataFrame()
 serNumCol = "Parent4"
 emulCol = "Parent3"
 funCol = "Parent2"
+#! ----------------------------------- FILE SETTINGS -----------------------------------
+
+
 
 scriptName = sys.argv[0]
 parser = argparse.ArgumentParser(description=str("Inputing arguments for " + scriptName))
@@ -89,37 +93,6 @@ def check_file_loc():
 
     except Exception as e:
         raise Exception("Error at check_file_loc : " + str(e))
-
-
-# ! WIP
-def get_test_info(df):
-
-    try:
-        if df["Parent3"].str.contains("PowerSupply", na=False).all():
-            df["Spec_EMUL"] = "PowerSupply"
-            print(df.to_string())
-            
-            sys.exit(1)
-        # elif df["Parent3"].contains("Eload"):
-        else:
-            df["Spec_EMUL"] = "ELoad"
-            print(df.to_string())
-            sys.exit(1)
-        
-        if df["Spec_EMUL"] == "PowerSupply":
-            if df["Parent2"].contains("VoltageAccuracyTest"):
-                df["Spec_FUNC"] = "VOLT"
-            else:
-                df["Spec_FUNC"] = "CURR"
-        
-        sys.exit(1)
-
-
-        return df
-
-    except Exception as e:
-        raise Exception("Error at get_test_info : " + str(e))
-
 
 
 def createDataFrame():
