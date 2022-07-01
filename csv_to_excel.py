@@ -7,14 +7,14 @@ import pandas as pd
 import numpy as np
 from openpyxl import load_workbook 
 
-import Unit_TestInfo as utif
+import get_info as utif
 
 #! ----------------------------------- FILE SETTINGS -----------------------------------
 # TODO: IO file settings, currently not in use
 user = 'weichan'
 csv_file_loc = os.getcwd() + "\\"
 output_file_loc = os.getcwd() + "\\"
-output_file_name = "balsa-testname" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".xlsx"
+output_file_name = "balsa-testname-" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".xlsx"
 output_full_path = output_file_loc + output_file_name
 
 # * dataFrame settings
