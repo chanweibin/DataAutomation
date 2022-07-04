@@ -43,10 +43,19 @@ def keyword_filter_row(df, column_label, keyword):
 
 
 def keywords_filter_row(df, column_label, keywords):
+    """Filter rows based on multiple keywords
+
+    Args:
+        df (dataframe): Dataframe to be filtered
+        column_label (string): Lookup column
+        keyword (string list): Filter keywords in regex
+
+    Returns:
+        dataframe: Dataframe with rows filtered on <column_label> that contains <keyword>
+    """
     dfnew = pd.DataFrame()
     for keyword in keywords:
-        df_key = keyword_filter_row(df, column_label, keyword)
-        dfnew = dfnew.append(df_key)
+        dfnew = dfnew.append(keyword_filter_row(df, column_label, keyword))
     
     return dfnew
 
@@ -141,7 +150,8 @@ def derive_std(df, result_list):
 
 
 def derive_VI(df):
-    df[""]
+    df["Voltage"] = df["Name"].str.split("_@")
+    return df
 
 
 #! ----------------------------------- EXPERIMENT -----------------------------------
@@ -151,7 +161,7 @@ def derive_VI(df):
 # df_psup = df[df["Parent3"].str.contains("PowerSupply", na=False)]
 # dfn = keywords_filter_row(df, ["Port1","Port2","Port3","Port4"])
 
-dfn = keywords_filter_row(df, "Parent2", ["Resistance","Current"])
+dfn = derive_VI(df)
 
 print(dfn)
 
