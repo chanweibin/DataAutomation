@@ -23,4 +23,4 @@ ToDo:
 4. Only takes raw data, then calculate specs 
 5. Tempco
 6. Add option to collect only data, or plot graph
-7. 
+7. Add sanity test to validate format (CSVm excel) follows format
