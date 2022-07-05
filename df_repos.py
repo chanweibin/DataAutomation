@@ -5,7 +5,7 @@ import re, sys
 
 #! ----------------------------------- FILE SETTINGS -----------------------------------
 # * load df for experiment purpose only 
-df = pd.read_excel("C:\\Users\\weichan\\Downloads\\BalsaIssue\\LPQ2\\SlotTest\\testing.xlsx")
+# df = pd.read_excel("C:\\Users\\weichan\\Downloads\\BalsaIssue\\LPQ2\\SlotTest\\testing.xlsx")
 # print(df)
 # df.dropna(inplace=True)
 
@@ -103,7 +103,7 @@ def merge_on(df_full, df, on):
 
 #* ----------------------------------- Deriving Data -----------------------------------
 
-def derive_new_column(df, lookup_column, new_column, formula):
+def derive_new_column_formula(df, lookup_column, new_column, formula): #! not ready to be used
     """Derive new column based on lookup column
 
     Args:
@@ -184,7 +184,7 @@ def derive_range(df):
 
 
     
-def derive_nominal(df, invert_VI=False):
+def derive_nominal(df):
     """Get nominal(V/I/P/R) for each test points
 
     Args:
@@ -196,15 +196,25 @@ def derive_nominal(df, invert_VI=False):
     """
     df_TestSetting = derive_test_settings(df)
     df_TestSetting["VI"] = df_TestSetting["VI"].str.extract("([0-9]+[.]?[0-9]*[AV]@[0-9]+[.]?[0-9]*[AV])", expand=False).str.split("@")
-    df["Voltage"] = df_TestSetting["VI"].str.get(0)
-    df["Current"] = df_TestSetting["VI"].str.get(1)
-    if invert_VI:
-        df["Voltage"], df["Current"] = df["Current"], df["Voltage"]
+    
+    df["Voltage"] = df_TestSetting["VI"].str.get(0) if "V" in df_TestSetting["VI"].str.get(0).to_string() else df_TestSetting["VI"].str.get(1) #* Get V/I, ?V@?A or
+    df["Current"] = df_TestSetting["VI"].str.get(1) if "A" in df_TestSetting["VI"].str.get(1).to_string() else df_TestSetting["VI"].str.get(0) #* ?A@?V
+    # if invert_VI:
+        # df["Voltage"], df["Current"] = df["Current"], df["Voltage"]
     
     df["Voltage"] = df.Voltage.str.extract('(\d+[.]?[0-9]*)', expand=False)  
     df["Current"] = df.Current.str.extract('(\d+[.]?[0-9]*)', expand=False)
     df["Power"] = df.Voltage.astype(float) * df.Current.astype(float)
     df["Resistance"] = df.Voltage.astype(float) / df.Current.astype(float)    
+    
+    return df
+
+
+def derive_range_nominal(df):
+    df_nom = derive_nominal(df)
+    df_range = derive_range(df)
+    
+    df = df_nom.merge(df_range)
     df.drop("VI", inplace=True, axis=1)
     
     return df
@@ -214,21 +224,21 @@ def derive_nominal(df, invert_VI=False):
 
 
 # df_psup = keyword_filter_row(df, "Parent3", "PowerSupply")
-df_load = keyword_filter_row(df, "Parent3", "ELoad")
-# df_psup.append(df_load)
-# ======================================================================
-df_load_CR = keyword_filter_row(df_load, "Parent2", "Resistance")
-df_load_CP = keyword_filter_row(df_load, "Parent2", "Power")
-df_load_CC = keyword_filter_row(df_load, "Parent2", "CurrentAccuracy")
-df_load_CV = keyword_filter_row(df_load, "Parent2", "Voltage")
+# df_load = keyword_filter_row(df, "Parent3", "ELoad")
+# # df_psup.append(df_load)
+# ###### ======================================================================
+# df_load_CR = keyword_filter_row(df_load, "Parent2", "Resistance")
+# df_load_CP = keyword_filter_row(df_load, "Parent2", "Power")
+# df_load_CC = keyword_filter_row(df_load, "Parent2", "CurrentAccuracy")
+# df_load_CV = keyword_filter_row(df_load, "Parent2", "Voltage")
 
-# df_psup_CC = keyword_filter_row(df_psup, "Parent2", "Current")
-# df_psup_CV = keyword_filter_row(df_psup, "Parent2", "Voltage")
-# ======================================================================
-df_load_CR_prog = keyword_filter_row(df_load_CR, "Name", "Prog")
-df_load_CP_prog = keyword_filter_row(df_load_CP, "Name", "Prog")
-df_load_CC_prog = keyword_filter_row(df_load_CC, "Name", "Prog")
-df_load_CV_prog = keyword_filter_row(df_load_CV, "Name", "Prog")
+# # df_psup_CC = keyword_filter_row(df_psup, "Parent2", "Current")
+# # df_psup_CV = keyword_filter_row(df_psup, "Parent2", "Voltage")
+# ###### ======================================================================
+# df_load_CR_prog = keyword_filter_row(df_load_CR, "Name", "Prog")
+# df_load_CP_prog = keyword_filter_row(df_load_CP, "Name", "Prog")
+# df_load_CC_prog = keyword_filter_row(df_load_CC, "Name", "Prog")
+# df_load_CV_prog = keyword_filter_row(df_load_CV, "Name", "Prog")
 
 # df_load_CP_rdbk = keyword_filter_row(df_load_CP, "Name", "Rdbk")
 # df_load_CC_rdbk = keyword_filter_row(df_load_CC, "Name", "Rdbk")
@@ -239,11 +249,11 @@ df_load_CV_prog = keyword_filter_row(df_load_CV, "Name", "Prog")
 
 # df_psup_CC_rdbk = keyword_filter_row(df_psup_CC, "Name", "Rdbk")
 # df_psup_CV_rdbk = keyword_filter_row(df_psup_CV, "Name", "Rdbk")
-# ======================================================================
+# ###### ======================================================================
 # a = [df_load_CR_prog, df_load_CP_prog, df_load_CC_prog, df_load_CV_prog, df_psup_CC_prog, df_psup_CV_prog]
-dfn = derive_nominal(df_load_CC_prog, True)
+# dfn = derive_range_nominal(df_load_CV_prog)
 
-print(dfn)
+# print(dfn)
 
 
 # for i in a:
