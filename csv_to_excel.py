@@ -114,7 +114,7 @@ def createDataFrame():
 
             if colname == "unit":
                 sn = utif.get_SN(rawDF[serNumCol]) 
-                resultName = "Result " + sn
+                resultName = "raw " + sn
                 percentName = "% " + sn
                 del(rawDF)
             else:

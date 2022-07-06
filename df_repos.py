@@ -5,7 +5,7 @@ import re, sys
 
 #! ----------------------------------- FILE SETTINGS -----------------------------------
 # * load df for experiment purpose only 
-# df = pd.read_excel("C:\\Users\\weichan\\Downloads\\BalsaIssue\\LPQ2\\SlotTest\\testing.xlsx")
+df = pd.read_excel("C:\\Users\\weichan\\Downloads\\BalsaIssue\\LPQ2\\SlotTest\\testing.xlsx")
 # print(df)
 # df.dropna(inplace=True)
 
@@ -15,17 +15,17 @@ import re, sys
 #* ----------------------------------- Filtering Data -----------------------------------
 
 
-def filter_column(df, column_list):
+def keyword_filter_column(df, keyword_list):
     """Filter dataframe based on column
 
     Args:
         df (dataframe): dataframe to read
-        column_list (list): list of column/label
+        keyword_list (list): list of column/label
 
     Returns:
         dataframe: Filtered Dataframe
     """
-    return df[column_list]
+    return df[keyword_list]
 
 
 
@@ -41,6 +41,7 @@ def keyword_filter_row(df, column_label, keyword):
         dataframe: Dataframe with rows filtered on <column_label> that contains <keyword>
     """
     return df[df[column_label].str.contains(keyword, na=False, regex=False)]
+
 
 
 def keywords_filter_row(df, column_label, keywords):
@@ -59,6 +60,27 @@ def keywords_filter_row(df, column_label, keywords):
         dfnew = dfnew.append(keyword_filter_row(df, column_label, keyword))
     
     return dfnew
+
+
+
+def keywords_filter_columns_name(df, keywords_list):
+    """Return list of columns name that matach keyword
+
+    Args:
+        df (dataframe)
+        keyword_list (string list ): keyword to filter dataframe columns
+
+    Returns:
+        list: list that contains keyword
+    """
+    return [col for col in df.columns if col in keywords_list]
+
+
+
+def keyword_filter_columns_name(df, keyword):
+    return [col for col in df.columns if keyword in col]
+
+
 
 def rename_column_label(df, old_namelist, new_namelist):
     """Rename column Label
@@ -82,6 +104,10 @@ def rename_column_label(df, old_namelist, new_namelist):
         df = df.rename(columns={old_namelist[i]:new_namelist[i]})
         
     return df
+
+
+
+
 
 
 #* ----------------------------------- Merge & Sort Data -----------------------------------
@@ -251,9 +277,14 @@ def derive_range_nominal(df):
 # df_psup_CV_rdbk = keyword_filter_row(df_psup_CV, "Name", "Rdbk")
 # ###### ======================================================================
 # a = [df_load_CR_prog, df_load_CP_prog, df_load_CC_prog, df_load_CV_prog, df_psup_CC_prog, df_psup_CV_prog]
-# dfn = derive_range_nominal(df_load_CV_prog)
+dfn = keywords_filter_columns_name(df, ["LowerLimit","UpperLimit"])
+dfn.extend(keyword_filter_columns_name(df, "Port"))
 
-# print(dfn)
+
+
+
+print(df.columns)
+print(dfn)
 
 
 # for i in a:
