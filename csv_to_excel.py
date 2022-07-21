@@ -7,7 +7,8 @@ import pandas as pd
 import numpy as np
 from openpyxl import load_workbook 
 
-import get_info as utif
+import data_get_info as info
+import data_df_repos as dfr
 
 #! ----------------------------------- FILE SETTINGS -----------------------------------
 # TODO: IO file settings, currently not in use
@@ -30,11 +31,10 @@ funCol = "Parent2"
 
 scriptName = sys.argv[0]
 parser = argparse.ArgumentParser(description=str("Inputing arguments for " + scriptName))
-parser.add_argument('-id', metavar="ID", help="Key in four digit ID")
 parser.add_argument('-csv', metavar="CSV", help="CSV files folder location")
 parser.add_argument('-output', metavar="Output file location", help="Location of file data to add in")
 parser.add_argument('-file', metavar="Output file name")
-parser.add_argument('-user', metavar="Username", help="User PC name")
+parser.add_argument('-user', metavar="Username", help="User PC name") # used only when choosing path
 parser.add_argument('-args1', metavar="Column1 Name", default="Name")
 parser.add_argument('-args2', metavar="Column2 Name", default="Result")
 parser.add_argument('-args3', metavar="Column3 Name", default="PercentSpec")
@@ -44,12 +44,6 @@ parser.add_argument('-pt', metavar="Sheet Name", default="Sheet1", help="Temp wo
 parser.add_argument('-colname', metavar="Choose SN name, unit || filename", default="unit")
 
 args = parser.parse_args()
-
-if args.id and args.id.isdigit():
-    id = int(args.id)
-else:
-    id = 0
-    # TODO: print("ID is null or non-digit, generating ID: {:04d}".format(id))
 
 if args.csv:
     csv_file_loc = args.csv
@@ -93,6 +87,8 @@ def check_file_loc():
 
     except Exception as e:
         raise Exception("Error at check_file_loc : " + str(e))
+            
+
 
 
 def createDataFrame():
@@ -113,7 +109,7 @@ def createDataFrame():
             resultDFList.append(rawDF)
 
             if colname == "unit":
-                sn = utif.get_SN(rawDF[serNumCol]) 
+                sn = info.get_SN(rawDF[serNumCol]) 
                 resultName = "raw " + sn
                 percentName = "% " + sn
                 del(rawDF)
@@ -127,21 +123,18 @@ def createDataFrame():
                 argslist.extend(args4)
             resultDFList[file] = resultDFList[file][argslist]
 
-            resultDFList[file] = resultDFList[file].set_index(args1)
             resultDFList[file] = resultDFList[file].rename(columns={args2:resultName, args3:percentName})
 
         # * compile df list into signle df
         compileDF = resultDFList[0]
         for file in range(len(files)-1):
-            compileDF = compileDF.merge(resultDFList[file+1], left_index=True, right_index=True, how="outer", suffixes=('','_y'))
-            compileDF.drop(compileDF.filter(regex='_y$').columns.tolist(), axis=1, inplace=True)
-        # print("MERGED:"+ compileDF.to_string())
+            compileDF = dfr.merge_on(compileDF, resultDFList[file+1], args1) 
         
         # * rearrage df
         compileDF.sort_index(axis=1, inplace=True) # sort column
         compileDF.sort_values(["Parent3","Name"], ascending=True, inplace=True, na_position="first") # sort rows
 
-        # compileDF = get_test_info(compileDF)
+        compileDF.set_index(args1, inplace=True)
     
         return compileDF
 
