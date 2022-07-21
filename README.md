@@ -23,3 +23,12 @@ ToDo:
 5. Tempco
 6. Add option to collect only data, or plot graph
 7. 
+
+
+Instruction to use:
+1. Download python3.10 from official website, create venv if there is requirment 
+2. Download/Pull repo from git
+3. Install dependencies by using command below
+    # pip install -r requirement.txt
+4. Run the test scripts, look for help by
+    # python <testscript>.py --help

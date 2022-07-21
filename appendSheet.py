@@ -2,56 +2,89 @@ from msilib.schema import Error
 import pandas as pd
 import argparse, os, sys
 from openpyxl import load_workbook
+from datetime import datetime
+import io_save_file as iosf
 
-output_file_loc = os.getcwd()
+file_loc = os.getcwd()
 csv_file_loc = os.getcwd()
+output_file_name = ("balsa-testname" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".xlsx").split(',')
 
 
 parser = argparse.ArgumentParser(description="This script helps to append csv file(s) into compiled excel sheet")
-parser.add_argument('-csv', metavar="CSV", help="CSV files folder location")
-parser.add_argument('-output', metavar="Output file location", help="Location of file data to add in")
-parser.add_argument('-file', metavar="Output file name")
+parser.add_argument('-icsv', metavar="Input CSV file location", help="CSV files folder location")
+parser.add_argument('-oloc', metavar="Output file location", help="Location of file data to add in")
+parser.add_argument('-ofile', metavar="Output file name")
+parser.add_argument('-ixl', metavar="Input excel file name(s), split with \',\' if more than 1 file")
 parser.add_argument('-args1', metavar="Column1 Name", default="Name")
 parser.add_argument('-args2', metavar="Column2 Name", default="Result")
 parser.add_argument('-args3', metavar="Column3 Name", default="PercentSpec")
+parser.add_argument('-append', metavar="[True|False]", help="Whether to append multiple excel to different sheets")
 
 args = parser.parse_args()
 
-if args.csv:
-    csv_file_loc = args.csv
+print(sys.argv)
+    
+if args.append:
+    append = args.append
+else:
+    append = None
+
+if args.icsv:
+    csv_file_loc = args.icsv
 else:
     pass # raise Exception("Please insert raw data file location")
 
-if args.output:
-    output_file_loc = args.output
+if args.oloc:
+    file_loc = args.oloc
 # else:
     # raise Error("Please insert excel file")
 
-if args.file:
-    output_file_name = args.file
+if args.ofile:
+    output_file_name = args.ofile
     if not output_file_name.endswith('.xlsx'):
         output_file_name += '.xlsx'
 else:
-    output_file_name = None
+    if not append:
+        output_file_name = [x for x in os.listdir(file_loc) if x.endswith(".xlsx")]
+        
+        if len(output_file_name) > 2:
+           print("Please specify file name")
+           raise Error("Please specify file name")
+    
+    
+if args.ixl:
+    input_excel_list = args.ixl.split(',')
+    for input_excel in input_excel_list:
+        if not input_excel.endswith('.xlsx'):
+            input_excel += '.xlsx'
+else:
+    os.chdir(file_loc)
+    input_excel_list = [x for x in os.listdir(file_loc) if x.endswith(".xlsx")]
+    
+
 
 args1, args2, args3 = args.args1, args.args2, args.args3
 
 
 
 def read_Excel():
-    global output_file_name
-    os.chdir(output_file_loc)
-    if not output_file_name:
-        output_file_name = [x for x in os.listdir(output_file_loc) if x.endswith(".xlsx")]
-    if len(output_file_name) > 2:
-        print("Please specify file name")
-        raise Error("Nope")
-    output_full_path = output_file_loc + "\\" + output_file_name[0]
-    xls = pd.ExcelFile(output_full_path, engine="openpyxl")
-    oldDF = pd.read_excel(xls, 0)
-    oldDF = oldDF.set_index(args1)
+    df_list = []
+    output_full_path = file_loc + "\\" + output_file_name[0]
+    os.chdir(file_loc)
     
-    return oldDF, output_full_path
+    if append:
+        for file in input_excel_list:
+            xls = pd.ExcelFile(file, engine="openpyxl")
+            df = pd.read_excel(xls, 0)
+            df_list.append(df)
+        return df_list, output_full_path
+    
+    else:
+        xls = pd.ExcelFile(output_full_path, engine="openpyxl")
+        oldDF = pd.read_excel(xls, 0)
+        oldDF = oldDF.set_index(args1)
+    
+        return oldDF, output_full_path
 
 
 
@@ -96,13 +129,27 @@ def add_csv_to_excel():
     return df, full_path
 
 
+def compile_multi_excels():
+    a=1
+    df_list, full_path = read_Excel()
+    iosf.create_excel_file(full_path)
+
+    for df in df_list:
+        name = "sheet" + str(a)
+        iosf.append_to_sheet(df, full_path, name)
+        a+=1
+
 
 if __name__ == "__main__":
-
-    df, output_full_path = add_csv_to_excel()
-    excelWorkbook = load_workbook(output_full_path)
-    writer = pd.ExcelWriter(output_full_path, engine='openpyxl')
-    writer.book = excelWorkbook
-    df.to_excel(writer, header=True)
-    writer.save()
+    
+    if append:
+        compile_multi_excels()
+    else:
+        df, output_full_path = add_csv_to_excel()
+        excelWorkbook = load_workbook(output_full_path)
+        writer = pd.ExcelWriter(output_full_path, engine='openpyxl')
+        writer.book = excelWorkbook
+        df.to_excel(writer, header=True)
+        writer.save()
+        
     print("Done...")
