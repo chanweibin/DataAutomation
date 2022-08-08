@@ -1,5 +1,6 @@
 import pandas as pd 
 import os, sys
+from openpyxl import Workbook, load_workbook
 
 # * =============================================== Sanity Check ==============================================
 
@@ -24,12 +25,28 @@ def csv_to_dataframe(full_file_path):
 
 
 def excel_to_dataframe(full_file_path):
-    return pd.read_excel(full_file_path)
+    file_name = full_file_path.split("\\")[-1]
+    file_loc = full_file_path.rstrip(file_name)
+    
+    if not file_name.endswith(".xlsx"):
+        print ("Please give full path to file! ")
+        sys.exit(1)
+        
+    os.chdir(file_loc)
+    xls = pd.ExcelFile(full_file_path, engine="openpyxl")
+    df = pd.read_excel(xls, 0)
+    
+    return df
 
 
 
 def xml_to_dataframe(full_file_path):
     return pd.read_xml(full_file_path)
+
+
+
+
+
 
 
 

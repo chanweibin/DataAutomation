@@ -4,6 +4,7 @@ import re, sys
 
 
 #! ----------------------------------- FILE SETTINGS -----------------------------------
+pd.options.mode.chained_assignment = None
 # * load df for experiment purpose only 
 # df = pd.read_excel("C:\\Users\\weichan\\Downloads\\BalsaIssue\\LPQ2\\SlotTest\\testing.xlsx")
 # print(df)
@@ -158,7 +159,7 @@ def derive_mean(df, result_list):
     Returns:
         Dataframe: Dataframe with mean
     """
-    df["Mean"] = df.drop(df.columns.difference(result_list) , axis=1).mean(axis=1)
+    df["Mean"] = df.drop(df.columns.difference(result_list) , axis=1).astype(float).mean(axis=1, numeric_only=True)
     return df
 
 
@@ -173,7 +174,7 @@ def derive_std(df, result_list):
     Returns:
         Dataframe: Dataframe with stdev
     """
-    df["Stdev"] = df.drop(df.columns.difference(result_list) , axis=1).std(axis=1)
+    df["Stdev"] = df.drop(df.columns.difference(result_list) , axis=1).astype(float).std(axis=1, numeric_only=True)
     return df
 
 

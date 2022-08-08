@@ -32,7 +32,7 @@ funCol = "Parent2"
 scriptName = sys.argv[0]
 parser = argparse.ArgumentParser(description=str("Inputing arguments for " + scriptName))
 parser.add_argument('-csv', metavar="CSV", help="CSV files folder location")
-parser.add_argument('-output', metavar="Output file location", help="Location of file data to add in")
+parser.add_argument('-oloc', metavar="Output file location", help="Location of file data to add in")
 parser.add_argument('-file', metavar="Output file name")
 parser.add_argument('-user', metavar="Username", help="User PC name") # used only when choosing path
 parser.add_argument('-args1', metavar="Column1 Name", default="Name")
@@ -41,17 +41,21 @@ parser.add_argument('-args3', metavar="Column3 Name", default="PercentSpec")
 parser.add_argument('-args4', metavar="Column4 Name", default="UpperLimit,LowerLimit,Parent3,Parent2") # those col that only occurs 1 time
 parser.add_argument('-args5', metavar="Column5 Name", default="Parent4") # cols that occur multiple times
 parser.add_argument('-pt', metavar="Sheet Name", default="Sheet1", help="Temp workaround")
-parser.add_argument('-colname', metavar="Choose SN name, unit || filename", default="unit")
+parser.add_argument('-colname', metavar="Choose column name, unit || filename", default="unit")
+parser.add_argument('-sernum', metavar="Choose SN column name")
 
 args = parser.parse_args()
+
+if args.sernum:
+    serNumCol = args.sernum
 
 if args.csv:
     csv_file_loc = args.csv
 else:
     pass # TODO: raise Exception("Please insert raw data file location")
 
-if args.output:
-    output_file_loc = args.output
+if args.oloc:
+    output_file_loc = args.oloc
 
 if args.file:
     output_file_name = args.file
@@ -132,7 +136,7 @@ def createDataFrame():
         
         # * rearrage df
         compileDF.sort_index(axis=1, inplace=True) # sort column
-        compileDF.sort_values(["Parent3","Name"], ascending=True, inplace=True, na_position="first") # sort rows
+        # compileDF.sort_values(["Parent3","Name"], ascending=True, inplace=True, na_position="first") # sort rows
 
         compileDF.set_index(args1, inplace=True)
     

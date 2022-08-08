@@ -27,7 +27,7 @@ def dataframe_to_excel(df, output_full_path, sheetName="Sheet1"):
             excelWorkbook = load_workbook(output_full_path)
             writer = pd.ExcelWriter(output_full_path, engine='openpyxl')
             writer.book = excelWorkbook
-            df.to_excel(writer, sheet_name=sheetName, index=True, header=True)
+            df.to_excel(writer, sheet_name=sheetName, index=False, header=True)
         writer.save()
         return print("... done\n")
         
@@ -41,9 +41,10 @@ def append_to_sheet(df, output_full_path, sheetName):
     excelWorkbook = load_workbook(output_full_path)
     writer = pd.ExcelWriter(output_full_path, engine='openpyxl')
     writer.book = excelWorkbook
-    df.to_excel(writer, sheet_name=sheetName, index=True, header=True)
+    df.to_excel(writer, sheet_name=sheetName, index=False, header=True)
     writer.save()
     print("saving file ...")
+
 
 
 def create_excel_file(full_path):

@@ -43,6 +43,7 @@ if args.input:
 
 if args.output:
     output_file_loc = args.output
+    output_full_name = output_file_loc + output_file_name
 
 args1, args2, args3 = args.args1, args.args2, args.args3
 args4 = []
@@ -86,20 +87,20 @@ def balsa_dA():
             resultDFList[file] = resultDFList[file].rename(columns={args2:resultName, args3:percentName})
             
             
-            # * compile df list into signle df
-            compileDF = resultDFList[0]
-            for file in range(len(files)-1):
-                compileDF = dfr.merge_on(compileDF, resultDFList[file+1], args1) 
+        # * compile df list into signle df
+        compileDF = resultDFList[0]
+        for file in range(len(files)-1):
+            compileDF = dfr.merge_on(compileDF, resultDFList[file+1], args1) 
             
                 
 
-            # * rearrage df
-            compileDF.sort_index(axis=1, inplace=True) # sort column
-            compileDF.sort_values(["Parent3","Name"], ascending=True, inplace=True, na_position="first") # sort rows
+        # * rearrage df
+        compileDF.sort_index(axis=1, inplace=True) # sort column
+        compileDF.sort_values(["Parent3","Name"], ascending=True, inplace=True, na_position="first") # sort rows
 
-            compileDF.set_index(args1, inplace=True)
-            
-            return compileDF 
+        compileDF.set_index(args1, inplace=True)
+        
+        return compileDF 
 
     except:
         pass
@@ -108,7 +109,7 @@ if __name__ == "__main__":
     iorf.loc_sanity_test(input_file_loc, output_file_loc)
     df = balsa_dA()
     
-    
+    df.reset_index(inplace=True)
     df_psup = dfr.keyword_filter_row(df, "Parent3", "PowerSupply")
     df_load = dfr.keyword_filter_row(df, "Parent3", "ELoad")
     ###### ======================================================================
@@ -117,6 +118,7 @@ if __name__ == "__main__":
     df_load_CC = dfr.keyword_filter_row(df_load, "Parent2", "CurrentAccuracy")
     df_load_CV = dfr.keyword_filter_row(df_load, "Parent2", "VoltageAccuracy")
 
+    df_psup_smallCurr = dfr.keyword_filter_row(df_psup, "Parent2", "SmallCurrent")
     df_psup_CC = dfr.keyword_filter_row(df_psup, "Parent2", "CurrentAccuracy")
     df_psup_CV = dfr.keyword_filter_row(df_psup, "Parent2", "VoltageAccuracy")
     ###### ======================================================================
@@ -135,16 +137,25 @@ if __name__ == "__main__":
     df_psup_CC_rdbk = dfr.keyword_filter_row(df_psup_CC, "Name", "Rdbk")
     df_psup_CV_rdbk = dfr.keyword_filter_row(df_psup_CV, "Name", "Rdbk")
     
+    df_psup_typical = df_psup.drop(pd.concat([df_psup_smallCurr, df_psup_CC, df_psup_CV]).index)
+    df_load_typical = df_load.drop(pd.concat([df_load_CR, df_load_CP, df_load_CC, df_load_CV]).index)
+    
     df_list = [df_load_CR_prog,df_load_CP_prog,df_load_CC_prog,df_load_CV_prog,
-              df_load_CP_rdbk,df_load_CC_rdbk,df_load_CV_rdbk, df_psup_CC_prog,
-              df_psup_CV_prog,df_psup_CC_rdbk,df_psup_CV_rdbk]
+              df_load_CP_rdbk,df_load_CC_rdbk,df_load_CV_rdbk,df_load_typical,
+              df_psup_smallCurr, df_psup_CC_prog, df_psup_CV_prog,df_psup_CC_rdbk,
+              df_psup_CV_rdbk, df_psup_typical]
         
 
-
-for df_test in df_list:
-    df_test = dfr.derive_range_nominal(df_test)
-    df_test = dfr.derive_mean(df_test, dfr.keyword_filter_columns_name("raw"))
-    df_test = dfr.derive_std(df_test, dfr.keyword_filter_columns_name("raw"))
-    iosf.append_to_sheet(df_test, output_full_name, df_test.index(df_test))
+    iosf.create_excel_file(output_full_name)
+    df_FULL = pd.DataFrame()
+    for df_test in df_list:
+        df_test = dfr.derive_range_nominal(df_test) # TODO: plan to use for spec calculation
+        cols = dfr.keyword_filter_columns_name(df_test, "raw")
+        df_test = dfr.derive_mean(df_test, cols)
+        df_test = dfr.derive_std(df_test, cols)
+        
+        df_FULL = pd.concat([df_FULL, df_test]) #! comment this for sheet per df
+        # iosf.append_to_sheet(df_test, output_full_name, 'test') #! uncomment this for sheet per df
+    iosf.dataframe_to_excel(df_FULL, output_full_name) #! comment this for sheet per df
     print("done...")
     
