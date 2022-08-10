@@ -30,7 +30,7 @@ def keyword_filter_column(df, keyword_list):
 
 
 
-def keyword_filter_row(df, column_label, keyword):
+def keyword_filter_row(df, column_label, keyword, add_label=False):
     """Filter rows based on keyword
 
     Args:
@@ -41,7 +41,10 @@ def keyword_filter_row(df, column_label, keyword):
     Returns:
         dataframe: Dataframe with rows filtered on <column_label> that contains <keyword>
     """
-    return df[df[column_label].str.contains(keyword, na=False, regex=False)]
+    df = df[df[column_label].str.contains(keyword, na=False, regex=False)]
+    if add_label:
+        df = keyword_add_label(df, column_label, keyword)
+    return df
 
 
 
@@ -61,6 +64,20 @@ def keywords_filter_row(df, column_label, keywords):
         dfnew = dfnew.append(keyword_filter_row(df, column_label, keyword))
     
     return dfnew
+
+
+def keyword_add_label(df, label, keyword):
+    """Add Label using keyword
+
+    Args:
+        df (dataframe)
+        keyword (string): Keyword to add in 
+
+    Returns:
+        dataframe
+    """
+    df[label] = keyword
+    return df
 
 
 
@@ -122,7 +139,19 @@ def merge_on(df_full, df, col):
 # TODO: merge on columns
 # TODO: merge on rows
 # TODO: sort on index
+
 # TODO: sort on cols
+    
+def sort_on_cols(df, col_list):
+    df[col_list] = df[col_list].astype(float)
+    df = df.sort_values(col_list, ascending=True, inplace=False, na_position="first")
+    return df
+    
+
+def sort_with_keywords():
+    pass
+
+
 # TODO: set/reset index # not recommended to use in merge, prefer merge_on
 
 
@@ -159,7 +188,7 @@ def derive_mean(df, result_list):
     Returns:
         Dataframe: Dataframe with mean
     """
-    df["Mean"] = df.drop(df.columns.difference(result_list) , axis=1).astype(float).mean(axis=1, numeric_only=True)
+    df["Mean"] = df.drop(df.columns.difference(result_list) , axis=1).astype(float, errors='ignore').mean(axis=1, numeric_only=True)
     return df
 
 
@@ -174,7 +203,7 @@ def derive_std(df, result_list):
     Returns:
         Dataframe: Dataframe with stdev
     """
-    df["Stdev"] = df.drop(df.columns.difference(result_list) , axis=1).astype(float).std(axis=1, numeric_only=True)
+    df["Stdev"] = df.drop(df.columns.difference(result_list) , axis=1).astype(float, errors='ignore').std(axis=1, numeric_only=True)
     return df
 
 

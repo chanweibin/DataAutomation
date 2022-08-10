@@ -1,4 +1,5 @@
 import argparse, sys, os
+from socket import INADDR_LOOPBACK
 import pandas as pd
 import data_df_repos as dfr
 import data_plot_graph as dpg
@@ -110,17 +111,17 @@ if __name__ == "__main__":
     df = balsa_dA()
     
     df.reset_index(inplace=True)
-    df_psup = dfr.keyword_filter_row(df, "Parent3", "PowerSupply")
-    df_load = dfr.keyword_filter_row(df, "Parent3", "ELoad")
+    df_psup = dfr.keyword_filter_row(df, "Parent3", "PowerSupply", True)
+    df_load = dfr.keyword_filter_row(df, "Parent3", "ELoad", True)
     ###### ======================================================================
-    df_load_CR = dfr.keyword_filter_row(df_load, "Parent2", "ResistanceAccuracy")
-    df_load_CP = dfr.keyword_filter_row(df_load, "Parent2", "PowerAccuracy")
-    df_load_CC = dfr.keyword_filter_row(df_load, "Parent2", "CurrentAccuracy")
-    df_load_CV = dfr.keyword_filter_row(df_load, "Parent2", "VoltageAccuracy")
+    df_load_CR = dfr.keyword_filter_row(df_load, "Parent2", "ResistanceAccuracy", True)
+    df_load_CP = dfr.keyword_filter_row(df_load, "Parent2", "PowerAccuracy", True)
+    df_load_CC = dfr.keyword_filter_row(df_load, "Parent2", "CurrentAccuracy", True)
+    df_load_CV = dfr.keyword_filter_row(df_load, "Parent2", "VoltageAccuracy", True)
 
-    df_psup_smallCurr = dfr.keyword_filter_row(df_psup, "Parent2", "SmallCurrent")
-    df_psup_CC = dfr.keyword_filter_row(df_psup, "Parent2", "CurrentAccuracy")
-    df_psup_CV = dfr.keyword_filter_row(df_psup, "Parent2", "VoltageAccuracy")
+    df_psup_smallCurr = dfr.keyword_filter_row(df_psup, "Parent2", "SmallCurrent", True)
+    df_psup_CC = dfr.keyword_filter_row(df_psup, "Parent2", "CurrentAccuracy", True)
+    df_psup_CV = dfr.keyword_filter_row(df_psup, "Parent2", "VoltageAccuracy", True)
     ###### ======================================================================
     df_load_CR_prog = dfr.keyword_filter_row(df_load_CR, "Name", "Prog")
     df_load_CP_prog = dfr.keyword_filter_row(df_load_CP, "Name", "Prog")
@@ -146,13 +147,25 @@ if __name__ == "__main__":
               df_psup_CV_rdbk, df_psup_typical]
         
 
-    iosf.create_excel_file(output_full_name)
+    # iosf.create_excel_file(output_full_name)
     df_FULL = pd.DataFrame()
     for df_test in df_list:
         df_test = dfr.derive_range_nominal(df_test) # TODO: plan to use for spec calculation
         cols = dfr.keyword_filter_columns_name(df_test, "raw")
         df_test = dfr.derive_mean(df_test, cols)
         df_test = dfr.derive_std(df_test, cols)
+        
+        if df_test["Parent2"].str.contains("PowerAccuracy").any():
+            df_test = dfr.sort_on_cols(df_test, ["Range", "Power", "Voltage", "Current"])
+        if df_test["Parent2"].str.contains("ResistanceAccuracy").any():
+            df_test = dfr.sort_on_cols(df_test, ["Range", "Resistance", "Voltage", "Current"])
+        if df_test["Parent2"].str.contains("VoltageAccuracy").any():
+            df_test = dfr.sort_on_cols(df_test, ["Range", "Voltage", "Current"])
+        if df_test["Parent2"].str.contains("CurrentAccuracy").any():
+            df_test = dfr.sort_on_cols(df_test, ["Range", "Current", "Voltage"])
+        
+        df_test.drop_duplicates("Name", inplace=True)
+            
         
         df_FULL = pd.concat([df_FULL, df_test]) #! comment this for sheet per df
         # iosf.append_to_sheet(df_test, output_full_name, 'test') #! uncomment this for sheet per df

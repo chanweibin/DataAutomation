@@ -20,7 +20,7 @@ def dataframe_to_excel(df, output_full_path, sheetName="Sheet1"):
         if not os.path.exists(output_full_path):
             print("File does not exist, creating new excel file now ...")
             writer = pd.ExcelWriter(output_full_path, engine='xlsxwriter')
-            df.to_excel(writer, sheet_name=sheetName, index=True, header=True)
+            df.to_excel(writer, sheet_name=sheetName, index=False, header=True)
         # append excel sheet if excel exists
         else:
             print("File exists, appending data to exising file ...")
