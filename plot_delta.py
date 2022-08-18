@@ -3,7 +3,7 @@ import glob
 import shutil
 import pandas as pd
 from openpyxl import Workbook, load_workbook
-import openpyxl
+from openpyxl.styles import Font
 from openpyxl.utils.cell import get_column_letter
 from openpyxl.chart import (
     LineChart,
@@ -192,6 +192,9 @@ if not df1.empty and not df2.empty :
         whole.to_excel(writer, sheet_name="Data Analysis", index=False, header=True, startrow=cnt)
         lastpos = plot_sigma_graph(worksheet,[27,59],cnt,whole.shape[0],"Others",lastpos)
         cnt += whole.shape[0] + 2
+
+    worksheet['A1'] = "(1) = " + df1_name + " | (2) = " + df2_name
+    worksheet['A1'].font = Font(bold=True,size=12)
 
     writer.save()
     print("saving file ...")
