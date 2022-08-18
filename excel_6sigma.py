@@ -69,9 +69,10 @@ def plot_sigma_graph(worksheet,cols_list,start,length,title,rowpos,colpos,width=
     worksheet.add_chart(chart,pos)
     return rowpos
 
+cwd = os.getcwd()
 scriptName = sys.argv[0]
 parser = argparse.ArgumentParser(description=str("Inputing arguments for " + scriptName))
-parser.add_argument('-input', metavar="Input file location", help="Source file location", default="E:\\6_Sigma") # input_file_loc = os.getcwd() + "\\"
+parser.add_argument('-input', metavar="Input file location", help="Source file location", default=cwd)
 args = parser.parse_args()
 
 if args.input:
@@ -102,14 +103,14 @@ name = os.path.basename(all_files[0])
 folder_and_name = all_files[0].replace(input_file_loc + "\\",'')
 df[folder_and_name] = df_temp['%'].astype(float)
 
-# destination = all_files[0].replace(name,'') + "Done"
-# try:
-#     shutil.move(all_files[0] , destination + "\\" + name)
-# except FileNotFoundError:
-#     os.mkdir(destination)
-#     shutil.move(all_files[0] , destination + "\\" + name)
-# except:
-#     pass
+destination = all_files[0].replace(name,'') + "Done"
+try:
+    shutil.move(all_files[0] , destination + "\\" + name)
+except FileNotFoundError:
+    os.mkdir(destination)
+    shutil.move(all_files[0] , destination + "\\" + name)
+except:
+    pass
 
 for file in range(1,len(all_files)):
     current_file_loc = all_files[file]
@@ -120,14 +121,14 @@ for file in range(1,len(all_files)):
     folder_and_name = all_files[file].replace(input_file_loc + "\\",'')
     df['%'] = df['%'].astype(float)
     df = df.rename(columns={'%':folder_and_name})
-    # destination = all_files[file].replace(name,'') + "Done"
-    # try:
-    #     shutil.move(all_files[file] , destination + "\\" + name)
-    # except FileNotFoundError:
-    #     os.mkdir(destination)
-    #     shutil.move(all_files[file] , destination + "\\" + name)
-    # except:
-    #     pass
+    destination = all_files[file].replace(name,'') + "Done"
+    try:
+        shutil.move(all_files[file] , destination + "\\" + name)
+    except FileNotFoundError:
+        os.mkdir(destination)
+        shutil.move(all_files[file] , destination + "\\" + name)
+    except:
+        pass
 
 df = df.merge(df_sigma[['Test Name','+3 Sigma','-3 Sigma']],on='Test Name').drop_duplicates()
 

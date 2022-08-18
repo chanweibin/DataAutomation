@@ -8,7 +8,6 @@ import io_save_file as iosf
 from datetime import datetime
 
 def read_datafile(inputfile_loc):
-    # df = pd.read_fwf("C:\\Users\\weipong8\\Downloads\\OLYFTS8 12A\\C12002770.8")
     df = pd.DataFrame({'Test Name':[],'Lo':[],'Result':[],'Hi':[],'%':[],'P/F':[]})
 
     file1 = open(inputfile_loc, 'r')
@@ -35,12 +34,10 @@ def read_datafile(inputfile_loc):
             df = pd.concat([df,new_row],ignore_index=True)
     return df
 
-# df = read_datafile('C:\\Users\\weipong8\\Downloads\\OLYFTS8 12A\\C12002770.8')
-
-# input_file_loc = "C:\\Users\\weipong8\\Downloads\\OLYFTS8 12B"
+cwd = os.getcwd()
 scriptName = sys.argv[0]
 parser = argparse.ArgumentParser(description=str("Inputing arguments for " + scriptName))
-parser.add_argument('-input', metavar="Input file location", help="Source file location", default="E:\\6_Sigma") # input_file_loc = os.getcwd() + "\\"
+parser.add_argument('-input', metavar="Input file location", help="Source file location", default=cwd)
 args = parser.parse_args()
 
 if args.input:

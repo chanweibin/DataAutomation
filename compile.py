@@ -59,7 +59,6 @@ def create_subtable_keyword(DF1,DF2,keyword_list,writer,title,startrowindex=1,la
     for name in col_names:
         col_list.append(list(result.columns).index(name) + 1)
     lastpos = plot_sigma_graph(worksheet,col_list,startrowindex,result.shape[0],title,lastpos,result.shape[1] + 1)
-    # iosf.append_to_sheet(result,output_full_name,"Data Analysis",start_row=cnt)
     startrowindex += result.shape[0] + 2
     return lastpos, startrowindex
 
@@ -75,19 +74,20 @@ def create_subtable_keywords(DF1,DF2,keyword_list,writer,title,startrowindex=1,l
     for name in col_names:
         col_list.append(list(result.columns).index(name) + 1)
     lastpos = plot_sigma_graph(worksheet,col_list,startrowindex,result.shape[0],title,lastpos,result.shape[1] + 1)
-    # iosf.append_to_sheet(result,output_full_name,"Data Analysis",start_row=cnt)
     startrowindex += result.shape[0] + 2
     return lastpos, startrowindex
 
+cwd = os.getcwd()
 scriptName = sys.argv[0]
 parser = argparse.ArgumentParser(description=str("Inputing arguments for " + scriptName))
-parser.add_argument('-input', metavar="Input file location", help="Source file location", default="C:\Local_Storage\Data") # input_file_loc = os.getcwd() + "\\"
+parser.add_argument('-input', metavar="Input file location", help="Source file location", default=cwd)
 args = parser.parse_args()
 
 if args.input:
     input_file_loc = args.input + "\\"
 
-txt = 'py .\init.py -input '
+dir_path = os.path.dirname(os.path.realpath(__file__))
+txt = 'py '+ dir_path +'\init.py -input '
 
 mover(input_file_loc + 'Compiled\\Eval_1', input_file_loc + 'Compiled\\Eval_1\\Transferred')
 temp = txt + input_file_loc + 'Eval_1' + ' -output ' + input_file_loc + 'Compiled\\' + 'Eval_1\\'
@@ -125,17 +125,16 @@ if not DF2.empty and not DF3.empty :
     
     cnt = 1
     lastpos = 3
-    # result = pd.concat([DF2,DF_null,DF3],axis="columns")
-    keyword_list = ['V Rdbk Accuracy','V Prog Accuracy','I Rdbk Accuracy','CurrentLimit Rdbk Accuracy','I_Lo Rdbk Accuracy','I Prog Accuracy','CurrentLimit Prog Accuracy','CurrentLoad','CurrentLine','VoltageLoad','VoltageLine','TransientResponse','CR Prog Accuracy','CP Prog Accuracy','CP Rdbk Accuracy','OvpAccuracyTest','NoiseTest','DOWN','UP','OVP Accuracy']
+    keyword_list = ['V Rdbk Accuracy','V Prog Accuracy','I Rdbk Accuracy','CurrentLimit Rdbk Accuracy','I_Lo Rdbk Accuracy','I Prog Accuracy',\
+        'CurrentLimit Prog Accuracy','CurrentLoad','CurrentLine','VoltageLoad','VoltageLine','TransientResponse','CR Prog Accuracy','CP Prog Accuracy',\
+        'CP Rdbk Accuracy','OvpAccuracyTest','NoiseTest','DOWN','UP','OVP Accuracy']
     DF2_temp = dfr.keyword_filter_row(DF2,'Name',keyword_list[0])
     DF3_temp = dfr.keyword_filter_row(DF3,'Name',keyword_list[0])
     result = DF2_temp.merge(DF3_temp,on='Name',suffixes=("_(Eval 1)","_(Eval 2)"))
-    # dpg.plot_3_sigma_graph(result,input_file_loc + "Voltage Readback Accuracy")
     Name_list = result['Name'].tolist()
     result = result.rename(columns={'Name':'Voltage Readback Accuracy'})
     result.insert(DF2_temp.shape[1], '','')
     result.to_excel(writer, sheet_name="Data Analysis", index=False, header=True, startrow=cnt)
-    # iosf.dataframe_to_excel(result,output_full_name,"Data Analysis")
     worksheet = excelWorkbook['Data Analysis']
     col_names = ['Mean_(Eval 1)','Mean_(Eval 2)']
     col_list = []
@@ -191,7 +190,6 @@ if not DF2.empty and not DF3.empty :
         whole.insert(DF2_temp.shape[1], '','')
         whole.to_excel(writer, sheet_name="Data Analysis", index=False, header=True, startrow=cnt)
         lastpos = plot_sigma_graph(worksheet,[27,59],cnt,whole.shape[0],"Others",lastpos)
-        # iosf.append_to_sheet(result,output_full_name,"Data Analysis",start_row=cnt)
         cnt += whole.shape[0] + 2
 
     writer.save()

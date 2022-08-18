@@ -20,13 +20,9 @@ serNumCol = "Parent4"
 emulCol = "Parent3"
 funCol = "Parent2"
 
-
-
-
-
 scriptName = sys.argv[0]
 parser = argparse.ArgumentParser(description=str("Inputing arguments for " + scriptName))
-parser.add_argument('-input', metavar="Input file location", help="Source file location", default="C:\Local_Storage\Data\Eval_1") # C:\Local_Storage\Data4Correlation\\test
+parser.add_argument('-input', metavar="Input file location", help="Source file location")
 parser.add_argument('-output', metavar="Target file location", help="Location of file data to add in")
 parser.add_argument('-args1', metavar="Column1 Name", default="Name")
 parser.add_argument('-args2', metavar="Column2 Name", default="Result")
@@ -72,8 +68,8 @@ def balsa_dA():
             rawDF = pd.read_csv(files[file])
 
             filename = files[file]
-            # if filename[7] != '_' :
-            #     rawDF.rename(columns={'Parent':'Parent1','Parent1':'Parent2','Parent2':'Parent3','Parent3':'Parent4','Spec%':'PercentSpec'}, inplace=True)
+            if filename[7] != '_' :
+                rawDF.rename(columns={'Parent':'Parent1','Parent1':'Parent2','Parent2':'Parent3','Parent3':'Parent4','Spec%':'PercentSpec'}, inplace=True)
 
             resultDFList.append(rawDF)
             
