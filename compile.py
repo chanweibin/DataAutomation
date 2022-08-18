@@ -92,12 +92,12 @@ txt = 'py .\init.py -input '
 mover(input_file_loc + 'Compiled\\Eval_1', input_file_loc + 'Compiled\\Eval_1\\Transferred')
 temp = txt + input_file_loc + 'Eval_1' + ' -output ' + input_file_loc + 'Compiled\\' + 'Eval_1\\'
 os.system(temp)
-# mover(input_file_loc + 'Eval_1', input_file_loc + 'Eval_1\\Transferred')
+mover(input_file_loc + 'Eval_1', input_file_loc + 'Eval_1\\Transferred')
 
 mover(input_file_loc + 'Compiled\\Eval_2', input_file_loc + 'Compiled\\Eval_2\\Transferred')
 temp = txt + input_file_loc + 'Eval_2' + ' -output ' + input_file_loc + 'Compiled\\' + 'Eval_2\\'
 os.system(temp)
-# mover(input_file_loc + 'Eval_2', input_file_loc + 'Eval_2\\Transferred')
+mover(input_file_loc + 'Eval_2', input_file_loc + 'Eval_2\\Transferred')
 
 output_file_name = "Balsa_" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".xlsx"
 output_full_name = input_file_loc + 'Result' + '\\' + output_file_name
