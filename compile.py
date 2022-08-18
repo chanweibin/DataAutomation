@@ -47,12 +47,17 @@ def plot_sigma_graph(worksheet,cols_list,start,length,title,rowpos,colpos,width=
     worksheet.add_chart(chart,pos)
     return rowpos
 
-def create_subtable_keyword(DF1,DF2,keyword_list,writer,title,startrowindex=1,lastpos=1):
+def create_subtable_keyword(DF1,DF2,keyword_list,writer,title,Parent3,Parent3_word="",startrowindex=1,lastpos=1):
     DF1_temp = dfr.keyword_filter_row(DF1,'Name',keyword_list)
     DF2_temp = dfr.keyword_filter_row(DF2,'Name',keyword_list)
+    if Parent3:
+        DF1_temp = dfr.keyword_filter_row(DF1_temp,'Parent3',Parent3_word)
+        DF2_temp = dfr.keyword_filter_row(DF2_temp,'Parent3',Parent3_word)
     result = DF1_temp.merge(DF2_temp,on='Name',suffixes=("_(Eval 1)","_(Eval 2)"))
+    if len(result.index) == 0:
+        return lastpos, startrowindex
     result = result.rename(columns={'Name':title})
-    result.insert(DF2_temp.shape[1], '','')
+    result.insert(DF1_temp.shape[1], '','')
     result.to_excel(writer, sheet_name="Data Analysis", index=False, header=True, startrow=startrowindex)
     col_names = ['Mean_(Eval 1)','Mean_(Eval 2)']
     col_list = []
@@ -62,12 +67,17 @@ def create_subtable_keyword(DF1,DF2,keyword_list,writer,title,startrowindex=1,la
     startrowindex += result.shape[0] + 2
     return lastpos, startrowindex
 
-def create_subtable_keywords(DF1,DF2,keyword_list,writer,title,startrowindex=1,lastpos=1):
+def create_subtable_keywords(DF1,DF2,keyword_list,writer,title,Parent3,Parent3_word="",startrowindex=1,lastpos=1):
     DF1_temp = dfr.keywords_filter_row(DF1,'Name',keyword_list)
     DF2_temp = dfr.keywords_filter_row(DF2,'Name',keyword_list)
+    if Parent3:
+        DF1_temp = dfr.keyword_filter_row(DF1_temp,'Parent3',Parent3_word)
+        DF2_temp = dfr.keyword_filter_row(DF2_temp,'Parent3',Parent3_word)
     result = DF1_temp.merge(DF2_temp,on='Name',suffixes=("_(Eval 1)","_(Eval 2)"))
+    if len(result.index) == 0:
+        return lastpos, startrowindex
     result = result.rename(columns={'Name':title})
-    result.insert(DF2_temp.shape[1], '','')
+    result.insert(DF1_temp.shape[1], '','')
     result.to_excel(writer, sheet_name="Data Analysis", index=False, header=True, startrow=startrowindex)
     col_names = ['Mean_(Eval 1)','Mean_(Eval 2)']
     col_list = []
@@ -80,7 +90,7 @@ def create_subtable_keywords(DF1,DF2,keyword_list,writer,title,startrowindex=1,l
 cwd = os.getcwd()
 scriptName = sys.argv[0]
 parser = argparse.ArgumentParser(description=str("Inputing arguments for " + scriptName))
-parser.add_argument('-input', metavar="Input file location", help="Source file location", default=cwd)
+parser.add_argument('-input', metavar="Input file location", help="Source file location", default="C:\Local_Storage\Data")
 args = parser.parse_args()
 
 if args.input:
@@ -129,10 +139,12 @@ if not DF2.empty and not DF3.empty :
         'CurrentLimit Prog Accuracy','CurrentLoad','CurrentLine','VoltageLoad','VoltageLine','TransientResponse','CR Prog Accuracy','CP Prog Accuracy',\
         'CP Rdbk Accuracy','OvpAccuracyTest','NoiseTest','DOWN','UP','OVP Accuracy']
     DF2_temp = dfr.keyword_filter_row(DF2,'Name',keyword_list[0])
+    DF2_temp = dfr.keyword_filter_row(DF2_temp,'Parent3','PowerSupply')
     DF3_temp = dfr.keyword_filter_row(DF3,'Name',keyword_list[0])
+    DF3_temp = dfr.keyword_filter_row(DF3_temp,'Parent3','PowerSupply')
     result = DF2_temp.merge(DF3_temp,on='Name',suffixes=("_(Eval 1)","_(Eval 2)"))
     Name_list = result['Name'].tolist()
-    result = result.rename(columns={'Name':'Voltage Readback Accuracy'})
+    result = result.rename(columns={'Name':'Voltage Readback Accuracy (PowerSupply)'})
     result.insert(DF2_temp.shape[1], '','')
     result.to_excel(writer, sheet_name="Data Analysis", index=False, header=True, startrow=cnt)
     worksheet = excelWorkbook['Data Analysis']
@@ -143,16 +155,24 @@ if not DF2.empty and not DF3.empty :
     lastpos = plot_sigma_graph(worksheet,col_list,cnt,result.shape[0],"Voltage Readback Accuracy",lastpos,result.shape[1] + 1) # width=17,height=2.6 # 27,25,28,59,57,60
     cnt += result.shape[0] + 2
 
-    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[1],writer,'Voltage Programming Accuracy',cnt,lastpos)
-    lastpos, cnt = create_subtable_keywords(DF2,DF3,keyword_list[2:4+1],writer,'Current Readback Accuracy',cnt,lastpos)
-    lastpos, cnt = create_subtable_keywords(DF2,DF3,keyword_list[5:6+1],writer,'Current Programming Accuracy',cnt,lastpos)
-    lastpos, cnt = create_subtable_keywords(DF2,DF3,keyword_list[7:8+1],writer,'Current Load and Line Accuracy',cnt,lastpos)
-    lastpos, cnt = create_subtable_keywords(DF2,DF3,keyword_list[9:10+1],writer,'Voltage Load and Line Accuracy',cnt,lastpos)
-    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[11],writer,'Transient Response',cnt,lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[0],writer,'Voltage Readback Accuracy (ELoad)',True,'ELoad',startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[1],writer,'Voltage Programming Accuracy (PowerSupply)',True,'PowerSupply',startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[1],writer,'Voltage Programming Accuracy (ELoad)',True,'ELoad',startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[2],writer,'Current Readback Accuracy (PowerSupply)',True,'PowerSupply',startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[2],writer,'Current Readback Accuracy (ELoad)',True,'ELoad',startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[5],writer,'Current Programming Accuracy (PowerSupply)',True,'PowerSupply',startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[5],writer,'Current Programming Accuracy (ELoad)',True,'ELoad',startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[4],writer,'I_Lo Rdbk Accuracy',False,startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keywords(DF2,DF3,[keyword_list[3],keyword_list[6]],writer,'CurrentLimit',False,startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keywords(DF2,DF3,keyword_list[7:8+1],writer,'Current Load and Line Accuracy',False,startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keywords(DF2,DF3,keyword_list[9:10+1],writer,'Voltage Load and Line Accuracy',False,startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[11],writer,'Transient Response',False,startrowindex=cnt,lastpos=lastpos)
     DF2_temp = dfr.keywords_filter_row(DF2,'Name',keyword_list[12:13+1])
-    DF2_temp = dfr.keyword_filter_row(DF2_temp,'Name',"Ω")
+    DF2_temp = dfr.keyword_filter_row(DF2_temp,'Parent2',"ResistanceAccuracy")
     DF3_temp = dfr.keywords_filter_row(DF3,'Name',keyword_list[12:13+1])
-    DF3_temp = dfr.keyword_filter_row(DF3_temp,'Name',"Ω")
+    DF3_temp = dfr.keyword_filter_row(DF3_temp,'Parent2',"ResistanceAccuracy")
+    DF2_temp['Name'] = DF2_temp['Name'].str.replace('?','Ω')
+    DF3_temp['Name'] = DF3_temp['Name'].str.replace('?','Ω')
     result = DF2_temp.merge(DF3_temp,on='Name',suffixes=("_(Eval 1)","_(Eval 2)"))
     result = result.rename(columns={'Name':'CR & CP Programming Accuracy (Resistance)'})
     result.insert(DF2_temp.shape[1], '','')
@@ -164,9 +184,9 @@ if not DF2.empty and not DF3.empty :
     lastpos = plot_sigma_graph(worksheet,col_list,cnt,result.shape[0],"CR & CP Programming Accuracy (Resistance)",lastpos,result.shape[1] + 1)
     cnt += result.shape[0] + 2
     DF2_temp = dfr.keywords_filter_row(DF2,'Name',keyword_list[12:13+1])
-    DF2_temp = dfr.keyword_filter_row(DF2_temp,'Name',"W")
+    DF2_temp = dfr.keyword_filter_row(DF2_temp,'Parent2',"PowerAccuracy")
     DF3_temp = dfr.keywords_filter_row(DF3,'Name',keyword_list[12:13+1])
-    DF3_temp = dfr.keyword_filter_row(DF3_temp,'Name',"W")
+    DF3_temp = dfr.keyword_filter_row(DF3_temp,'Parent2',"PowerAccuracy")
     result = DF2_temp.merge(DF3_temp,on='Name',suffixes=("_(Eval 1)","_(Eval 2)"))
     result = result.rename(columns={'Name':'CR & CP Programming Accuracy (Power Accuracy)'})
     result.insert(DF2_temp.shape[1], '','')
@@ -177,13 +197,14 @@ if not DF2.empty and not DF3.empty :
         col_list.append(list(result.columns).index(name) + 1)
     lastpos = plot_sigma_graph(worksheet,col_list,cnt,result.shape[0],"CR & CP Programming Accuracy (Power Accuracy)",lastpos,result.shape[1] + 1)
     cnt += result.shape[0] + 2
-    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[14],writer,'CP Readback Accuracy',cnt,lastpos)
-    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[15],writer,'OvpAccuracyTest',cnt,lastpos)
-    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[16],writer,'NoiseTest',cnt,lastpos)
-    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[17],writer,'DOWN',cnt,lastpos)
-    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[18],writer,'UP',cnt,lastpos)
-    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[19],writer,'OVP Accuracy',cnt,lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[14],writer,'CP Readback Accuracy',False,startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[15],writer,'OvpAccuracyTest',False,startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[16],writer,'NoiseTest',False,startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[17],writer,'DOWN',False,startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[18],writer,'UP',False,startrowindex=cnt,lastpos=lastpos)
+    lastpos, cnt = create_subtable_keyword(DF2,DF3,keyword_list[19],writer,'OVP Accuracy',False,startrowindex=cnt,lastpos=lastpos)
     
+    copy = whole
     whole = whole[~whole.Name.str.contains('|'.join(keyword_list))]
     if len(whole.index) != 0:
         whole = whole.rename(columns={'Name':'Others'})
@@ -194,3 +215,6 @@ if not DF2.empty and not DF3.empty :
 
     writer.save()
     print("saving file ...")
+
+    copy['Delta'] = abs(copy['Mean_(Eval 2)'] - copy['Mean_(Eval 1)'])
+    iosf.dataframe_to_excel(copy,output_full_name,"Delta")
