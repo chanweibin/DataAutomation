@@ -1,3 +1,4 @@
+
 # DataAutomation
 Automation to consolidate data from csv file  ( )
   1. To excel (X)
@@ -34,3 +35,15 @@ Instruction to use:
     # pip install -r requirement.txt
 4. Run the test scripts, look for help by
     # python <testscript>.py --help
+=======
+# DataAutomation
+Automation to consolidate data from csv file  ( )
+  1. To excel ( )
+  2. To graph ( )
+able to calculate spec w/ w/t tempCo          ( )
+retrieve data from raw data                   ( )
+  1. Naming   ( )
+  2. Unit SN  ( )
+  3. PT No.   ( )
+  4. 
+

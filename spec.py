@@ -1,3 +1,77 @@
+
+# [Balsa]
+balsaSpec = {
+    "PowerSupplySpec":
+    {
+        "Current":
+        {
+            "High": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 },
+            "Low": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 }},
+
+        "Voltage":
+        {
+            "High": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 },
+            "Low": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 }}},
+
+    "EloadSpec":
+    {
+        "Current":
+        {
+            "High": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 },
+            "Mid": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 },
+            "Low": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 }},
+
+        "Voltage":
+        {
+            "High": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 },
+            "Mid": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 },
+            "Low": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 }},
+        "Power":
+        {
+            "High": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 },
+            "Mid": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 },
+            "Low": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 }},
+
+        "Resistance":
+        {
+            "High": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 },
+            "Mid": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 },
+            "Low": {
+                "Gain"      :   0.00001,
+                "Offset"    :   0.0001 }}}}
+
+x = (balsaSpec["PowerSupplySpec"]["Current"]["High"]["Gain"])
+=======
 # [Balsa]
 # ==================== LOAD PROG =========================================
 load_V_High_prog = {
@@ -172,6 +246,7 @@ balsaSpec = {
 balsaRange = {
     "PSUP"  :   
         {
+
         "Voltage"   : 
             {
             "Auto"  : ["Auto", "Range30V"]
@@ -204,6 +279,3 @@ Spec = "Gain"
 # x = eval("balsaSpec[emul]")
 x = balsaSpec[emul][func][type][Range][Spec]
 print(x)
-
-# PSUP_Voltage_Prog_Low: list[str] = ["PowerSupply", "Voltage", "Prog", "Low"]
-# PSUP_Voltage_Prog_High: list[str] = ["PowerSupply", "Voltage", "Prog", "Range30V"]
