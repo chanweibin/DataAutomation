@@ -87,83 +87,83 @@ psup_C_Low_prog = psup_C_High_prog
 
 
 balsaSpec = {
-    "PSUP"   :
+    "PowerSupply"   :
     {
-        "Current"   :
+        "CurrentAccuracy"   :
         {
             "Prog"  :
                 {
-                "High"  : psup_C_High_prog,
-                "Low"   : psup_C_Low_prog
+                "20"  : psup_C_High_prog,
+                "2"   : psup_C_Low_prog
                 },
             "Rdbk"  :
                 {
-                "High"  : psup_C_High_rdbk,
-                "Low"   : psup_C_Low_rdbk
+                "20"  : psup_C_High_rdbk,
+                "2"   : psup_C_Low_rdbk
                 },
-                
-        "Voltage":
+        },
+        "VoltageAccuracy":
         {
             "Prog"  :
                 {    
-                "Auto"  : psup_V_Auto_prog
+                "30"  : psup_V_Auto_prog
                 },
             "Rdbk"  :
                 {
-                "Auto"  : psup_V_Auto_rdbk
-                }}}},
-    "LOAD":
+                "30"  : psup_V_Auto_rdbk
+                }}},
+    "ELoad":
     {
-        "Current":
+        "CurrentAccuracy":
         {
             "Prog"  :
                 {
-                    "High"  : load_C_High_prog,
-                    "Low"   : load_C_Low_prog
+                    "40"  : load_C_High_prog,
+                    "4"   : load_C_Low_prog
                 },
             "Rdbk"  :
                 {
-                    "High"  : load_C_High_rdbk,
-                    "Low"   : load_C_Low_rdbk
+                    "40"  : load_C_High_rdbk,
+                    "4"   : load_C_Low_rdbk
                 }
         },
         
-        "Voltage":
+        "VoltageAccuracy":
         {
             "Prog"  :
                 {
-                    "High"  : load_V_High_prog,
-                    "Low"   : load_V_Low_prog
+                    "60"  : load_V_High_prog,
+                    "15"   : load_V_Low_prog
                 },
             "Rdbk"  :
                 {
-                    "High"  : load_V_High_rdbk,
-                    "Low"   : load_V_Low_rdbk
+                    "60"  : load_V_High_rdbk,
+                    "15"   : load_V_Low_rdbk
                 }
         },
         
-        "Power":
+        "PowerAccuracy":
         {
             "Prog"  :
                 {
-                    "High"  : load_P_High_prog,
-                    "Mid"   : load_P_Mid_prog,
-                    "Low"   : load_P_Low_prog
+                    "250"  : load_P_High_prog,
+                    "25"   : load_P_Mid_prog,
+                    "5"   : load_P_Low_prog
                 },
             "Rdbk"  :
                 {
-                    "High"  : load_P_High_rdbk,
-                    "Mid"   : load_P_Mid_rdbk,
-                    "Low"   : load_P_Low_rdbk
+                    "250"  : load_P_High_rdbk,
+                    "25"   : load_P_Mid_rdbk,
+                    "5"   : load_P_Low_rdbk
                 }
         },
-        "Resistance":
+        "ResistanceAccuracy":
         {
             "Prog"  :
                 {
-                    "High"  : load_R_High_prog,
-                    "Mid"   : load_R_Mid_prog,
-                    "Low"   : load_P_Low_prog
+                    "4000"  : load_R_High_prog,
+                    "1250"   : load_R_Mid_prog,
+                    "30"   : load_P_Low_prog
                 }
         }
     }
@@ -194,10 +194,16 @@ balsaRange = {
         
 }
             
-        
 
-x = balsaSpec["LOAD"]["Resistance"]["Prog"]["Low"]["Offset"]
+emul = "ELoad"
+func = "ResistanceAccuracy"
+type = "Prog"
+Range = "1250"
+Spec = "Gain"        
+
+# x = eval("balsaSpec[emul]")
+x = balsaSpec[emul][func][type][Range][Spec]
 print(x)
 
-PSUP_Voltage_Prog_Low = ["PowerSupply", "Voltage", "Prog", "Low"]
-PSUP_Voltage_Prog_High = ["PowerSupply", "Voltage", "Prog", "Range30V"]
+# PSUP_Voltage_Prog_Low: list[str] = ["PowerSupply", "Voltage", "Prog", "Low"]
+# PSUP_Voltage_Prog_High: list[str] = ["PowerSupply", "Voltage", "Prog", "Range30V"]

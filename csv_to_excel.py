@@ -72,6 +72,8 @@ args1, args2, args3 = args.args1, args.args2, args.args3
 args4 = []
 if args.args4:
     args4 = args.args4.split(",")
+if args.args5:
+    serNumCol = args.args5
 
 if args.colname:
     colname = args.colname
@@ -116,7 +118,6 @@ def createDataFrame():
                 sn = info.get_SN(rawDF[serNumCol]) 
                 resultName = "raw " + sn
                 percentName = "% " + sn
-                del(rawDF)
             else:
                 name = files[file].split(".csv")[0]
                 resultName = "raw " + name

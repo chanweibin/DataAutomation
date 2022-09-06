@@ -1,3 +1,10 @@
+"""
+To merge csv files into excel file based on "Name" column, user can input to overwrite default value
+ 
+"""
+__author__ = "Chan Wei Bin"
+
+
 from msilib.schema import Error
 import pandas as pd
 import argparse, os, sys
@@ -69,7 +76,7 @@ args1, args2, args3 = args.args1, args.args2, args.args3
 
 def read_Excel():
     df_list = []
-    output_full_path = file_loc + "\\" + output_file_name[0]
+    output_full_path:str = file_loc + "\\" + output_file_name[0]
     os.chdir(file_loc)
     
     if append:

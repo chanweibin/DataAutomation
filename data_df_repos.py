@@ -129,9 +129,14 @@ def rename_column_label(df, old_namelist, new_namelist):
 #* ----------------------------------- Merge & Sort Data -----------------------------------
 
 # TODO: merge on
-def merge_on(df_full, df, col):
-    df_full = df_full.merge(df, on=col, how="outer", suffixes=('','_y'))
-    df_full.drop(df_full.filter(regex='_y$').columns.tolist(), axis=1, inplace=True)
+def merge_on(df_full, df, col, drop=True):
+    if df_full.empty:
+        print("dataframe empty")
+        df_full = df
+    else:
+        df_full = df_full.merge(df, on=col, how="outer", suffixes=('','_y'))
+        if drop:
+            df_full.drop(df_full.filter(regex='_y$').columns.tolist(), axis=1, inplace=True)
     return df_full
     
 
@@ -260,8 +265,14 @@ def derive_nominal(df):
     # if invert_VI:
         # df["Voltage"], df["Current"] = df["Current"], df["Voltage"]
     
+
+    
     df["Voltage"] = df.Voltage.str.extract('(\d+[.]?[0-9]*)', expand=False)  
     df["Current"] = df.Current.str.extract('(\d+[.]?[0-9]*)', expand=False)
+    
+    df["Voltage"] = round(df["Voltage"].astype(float), 6)
+    df["Current"] = round(df["Current"].astype(float), 6)
+    
     df["Power"] = df.Voltage.astype(float) * df.Current.astype(float)
     df["Resistance"] = df.Voltage.astype(float) / df.Current.astype(float)    
     

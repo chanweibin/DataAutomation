@@ -23,14 +23,18 @@ def get_unit_info(dfCol):
         return serialNum, modelName
 
     except Exception as e:
-        raise Exception(e)
+        raise Exception("Error on getting SN/Model: " + e)
 
 
 
 
 def get_SN(dfCol):
-    sn, md = get_unit_info(dfCol)
-    return sn
+    try:
+        sn, md = get_unit_info(dfCol)
+        return sn
+    except Exception as e:
+        print("Error : " + e)
+        sys.exit(1)
 
 
 
@@ -57,3 +61,9 @@ def get_test_temp():
 def get_CV_info():
     
     return
+
+
+def get_first_val(dfCol):
+    firstRow = dfCol.first_valid_index()
+    return dfCol.at[firstRow]
+        
